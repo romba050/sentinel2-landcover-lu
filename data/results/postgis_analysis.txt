@@ -1,0 +1,70 @@
+
+--- Predicted land cover by class across the whole scene ---
+ class_id                class_name  n_polygons  area_km2  pct_of_scene
+        6       Broad-leaved forest         870    162.80          39.7
+        4                  Pastures        1499     93.37          22.8
+        1       Artificial surfaces        1077     88.57          21.6
+        2               Arable land        1514     52.92          12.9
+        5 Heterogeneous agriculture        1520     12.12           3.0
+        8              Mixed forest          68      0.35           0.1
+        7         Coniferous forest          22      0.09           0.0
+
+--- Land cover per commune, only where the scene covers at least 90 percent of it ---
+      commune lau2  pct_covered  forest_km2  built_km2  total_km2  forest_pct
+     Steinsel 0308        100.0       13.88       2.81      20.76        66.8
+      Kopstal 0107        100.0        4.80       1.61       7.63        62.8
+  Niederanven 0305        100.0       23.64       7.61      39.38        60.0
+  Walferdange 0310        100.0        3.08       2.62       6.64        46.4
+Lorentzweiler 0408        100.0        7.53       2.18      16.38        46.0
+     Strassen 0309        100.0        4.52       3.42       9.94        45.5
+   Leudelange 0207        100.0        4.77       2.26      12.80        37.2
+   Sandweiler 0306        100.0        2.60       2.86       7.20        36.0
+   Hesperange 0303        100.0        8.18       6.31      25.65        31.9
+   Luxembourg 0304        100.0       14.95      26.32      49.21        30.4
+      Contern 0302         97.0        5.37       3.80      18.50        29.0
+  Schuttrange 0307         93.0        3.39       3.07      13.64        24.8
+    Bertrange 0301         99.0        3.70       3.98      15.87        23.3
+
+--- The five most built-up communes fully inside the scene ---
+    commune  built_km2  built_pct
+ Luxembourg      26.32       53.5
+ Sandweiler       2.86       39.6
+Walferdange       2.62       39.5
+   Strassen       3.42       34.4
+  Bertrange       3.98       25.1
+
+--- Predicted area versus CORINE reference area, per class ---
+               class_name  corine_km2  predicted_km2  difference_km2  pct_difference
+Heterogeneous agriculture       61.87          12.12          -49.75           -80.4
+      Broad-leaved forest      128.88         162.80           33.92            26.3
+                 Pastures       72.07          93.37           21.29            29.5
+             Mixed forest       18.35           0.35          -18.00           -98.1
+        Coniferous forest       10.17           0.09          -10.08           -99.2
+              Arable land       60.68          52.92           -7.77           -12.8
+      Artificial surfaces       87.25          88.57            1.33             1.5
+
+--- Built-up land the model sees where CORINE 2018 does not, by commune ---
+      commune  built_outside_corine_km2
+   Luxembourg                     2.349
+  Niederanven                     1.793
+   Hesperange                     1.784
+      Contern                     1.195
+  Schuttrange                     1.046
+   Leudelange                     0.905
+   Sandweiler                     0.647
+     Steinsel                     0.583
+Lorentzweiler                     0.571
+    Bertrange                     0.560
+
+--- The ten largest contiguous predicted forest patches ---
+ rank          class_name  area_km2  raw_perimeter_m  simplified_perimeter_m  compactness
+    1 Broad-leaved forest     45.79         544340.0                427480.0        0.003
+    2 Broad-leaved forest     39.36         474460.0                371551.0        0.004
+    3 Broad-leaved forest      9.32          94800.0                 71387.0        0.023
+    4 Broad-leaved forest      7.62          61000.0                 45685.0        0.046
+    5 Broad-leaved forest      7.55          90500.0                 67403.0        0.021
+    6 Broad-leaved forest      6.42          58280.0                 44319.0        0.041
+    7 Broad-leaved forest      3.18          24000.0                 17890.0        0.125
+    8 Broad-leaved forest      2.83          24420.0                 18648.0        0.102
+    9 Broad-leaved forest      2.82          38980.0                 29516.0        0.041
+   10 Broad-leaved forest      2.36          39960.0                 30699.0        0.032

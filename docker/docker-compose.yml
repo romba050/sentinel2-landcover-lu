@@ -1,8 +1,12 @@
-version: '3.8'
-
+# PostGIS for the spatial-analysis stage.
+#
+# Image choice: the official postgis/postgis tags are amd64-only, so on an
+# Apple-silicon machine they run under emulation. baosystems publishes the same
+# PostgreSQL 16 / PostGIS 3.4 combination as a genuine multi-arch image, which
+# runs natively on arm64 and still works on amd64 CI.
 services:
   postgis:
-    image: postgis/postgis:16-3.4
+    image: ghcr.io/baosystems/postgis:16-3.4
     container_name: sentinel2_postgis
     environment:
       POSTGRES_USER: geouser
@@ -13,6 +17,11 @@ services:
     volumes:
       - postgis_data:/var/lib/postgresql/data
       - ../sql:/sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geouser -d landcover"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     restart: unless-stopped
 
 volumes:
