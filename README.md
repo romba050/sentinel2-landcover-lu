@@ -13,7 +13,7 @@ validation**, and the result loaded into PostGIS for per-commune analysis.
 > satellite imagery. It is not production work and does not represent prior
 > professional Earth-observation experience. It was built with Claude Code
 > (agentic development); every design decision in it is one I can defend, and
-> the things that went wrong are documented below rather than quietly fixed.
+> the things that went wrong are documented below.
 
 ---
 
@@ -152,6 +152,7 @@ uv run python -m src.evaluation.figures          # result figures
 docker compose -f docker/docker-compose.yml up -d
 uv run python -m src.postprocessing.to_postgis   # load + spatial analysis
 uv run python -m src.postprocessing.qgis_styles  # QGIS .qml styles
+uv run python -m src.postprocessing.web_export   # static web demo -> web/
 uv run pytest                                    # 68 tests
 ```
 
@@ -205,6 +206,19 @@ Selected output (`data/results/postgis_analysis.txt`):
 | Steinsel | 13.88 km² | 2.81 km² | 66.8% |
 | Niederanven | 23.64 km² | 7.61 km² | 60.0% |
 | Luxembourg | 14.95 km² | 26.32 km² | 30.4% |
+
+### 5. Interactive demo — `web/`, `src/postprocessing/web_export.py`
+
+A fully static web map (`web/index.html`): swipe between the Sentinel-2 scene
+and the classification, or switch to a per-commune forest choropleth with
+partially-imaged communes explicitly excluded from the rating. No server, no
+tile provider, no external requests — the whole demo is ~2.3 MB of files that
+work from any static host. See `web/README.md` for embedding instructions.
+
+The display rasters are warped to Web-Mercator at export time (UTM 31N is
+rotated ~2.4° against the Mercator graticule here — overlaying raw UTM pixels
+would misplace the corners by hundreds of metres); the analysis rasters stay in
+their native CRS.
 
 ---
 
@@ -301,4 +315,5 @@ sql/                schema + spatial analysis queries
 tests/              68 tests (pure logic + integration against a real stack)
 docker/             PostGIS container
 qgis/               generated .qml styles + layout instructions
+web/                static interactive demo (swipe map + choropleth)
 ```

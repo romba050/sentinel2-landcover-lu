@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentinel-2 land cover — Luxembourg</title>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<style>
+  :root {
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #8a887f;
+    --line: #e4e3de;
+    --surface: #fcfcfb;
+    --panel: #ffffff;
+    --accent: #2a78d6;
+    --accent-2: #eb6834;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+    display: flex;
+  }
+
+  /* ---------- sidebar ---------- */
+  #panel {
+    width: 340px;
+    min-width: 340px;
+    height: 100%;
+    overflow-y: auto;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 22px 22px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  #panel h1 { font-size: 17px; line-height: 1.3; letter-spacing: -0.01em; }
+  #panel h1 small { display: block; font-size: 12px; font-weight: 400; color: var(--ink-2); margin-top: 4px; }
+  #panel h2 {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 8px;
+  }
+  section { border-top: 1px solid var(--line); padding-top: 14px; }
+  section:first-of-type { border-top: 0; padding-top: 0; }
+
+  .mode { display: flex; gap: 6px; }
+  .mode button {
+    flex: 1; padding: 7px 4px; font: 600 12.5px/1.2 inherit;
+    border: 1px solid var(--line); border-radius: 7px;
+    background: var(--panel); color: var(--ink-2); cursor: pointer;
+  }
+  .mode button.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+  .stat .v { font-size: 21px; font-weight: 650; letter-spacing: -0.02em; }
+  .stat .l { font-size: 11px; color: var(--ink-2); line-height: 1.35; }
+  .note { font-size: 12px; color: var(--ink-2); }
+  .note b { color: var(--ink); font-weight: 600; }
+
+  .legend { display: flex; flex-direction: column; gap: 5px; }
+  .legend .row { display: flex; align-items: center; gap: 9px; font-size: 12.5px; }
+  .legend .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.18); flex: none; }
+  .legend .pct { margin-left: auto; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .toggles label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 3px 0; cursor: pointer; }
+  .toggles input { accent-color: var(--accent); }
+
+  footer { margin-top: auto; border-top: 1px solid var(--line); padding-top: 12px;
+           font-size: 10.5px; color: var(--ink-3); line-height: 1.6; }
+  footer a { color: var(--ink-3); }
+
+  /* ---------- map ---------- */
+  #mapwrap { position: relative; flex: 1; height: 100%; }
+  #map { position: absolute; inset: 0; background: #dfe6dc; }
+  .leaflet-container { font: inherit; }
+
+  /* swipe divider */
+  #divider {
+    position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px;
+    background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.25);
+    z-index: 700; cursor: ew-resize; touch-action: none;
+  }
+  #divider .grip {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--ink-2); user-select: none;
+  }
+  .swipe-label {
+    position: absolute; top: 12px; z-index: 650;
+    background: rgba(255,255,255,.92); border-radius: 6px;
+    padding: 3px 9px; font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+    pointer-events: none;
+  }
+  #label-left { left: 56px; } /* clear of the zoom control */
+  #label-right { right: 12px; }
+
+  .leaflet-tooltip.commune-tip { font: 12.5px/1.5 inherit; padding: 8px 11px; }
+  .commune-tip b { font-size: 13px; }
+  .commune-tip .warn { color: var(--accent-2); font-size: 11.5px; }
+
+  @media (max-width: 760px) {
+    body { flex-direction: column; }
+    #panel { width: 100%; min-width: 0; height: auto; max-height: 45%; border-right: 0; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+
+<aside id="panel">
+  <h1>Land cover from Sentinel-2
+    <small id="subtitle"></small>
+  </h1>
+
+  <section>
+    <div class="mode" role="tablist">
+      <button id="mode-swipe" class="active">Imagery ⇆ classification</button>
+      <button id="mode-choro">Forest % by commune</button>
+    </div>
+  </section>
+
+  <section id="sec-legend">
+    <h2 id="legend-title">Classes</h2>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section>
+    <h2>Honest numbers</h2>
+    <div class="stats" id="stats"></div>
+    <p class="note" style="margin-top:10px" id="method-note"></p>
+  </section>
+
+  <section class="toggles">
+    <h2>Layers</h2>
+    <label><input type="checkbox" id="tg-communes" checked> Commune boundaries</label>
+  </section>
+
+  <footer>
+    Random Forest on 15 spectral features, labels from CORINE 2018.
+    A self-directed learning project — <span id="gen"></span>.<br>
+    Contains modified Copernicus Sentinel data 2024 ·
+    CORINE © European Environment Agency ·
+    communes © ACT / data.public.lu ·
+    <a href="https://leafletjs.com">Leaflet</a>
+  </footer>
+</aside>
+
+<div id="mapwrap">
+  <div id="map"></div>
+  <div class="swipe-label" id="label-left">Sentinel-2, true colour</div>
+  <div class="swipe-label" id="label-right">Random Forest classification</div>
+  <div id="divider"><div class="grip">⇆</div></div>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="data.js"></script>
+<script>
+"use strict";
+
+/* ----------------------------------------------------------------------- */
+/* Map setup: no external basemap on purpose. The page must work offline    */
+/* and never stall on a tile server mid-demo; within the AOI the imagery    */
+/* itself is the basemap.                                                   */
+/* ----------------------------------------------------------------------- */
+const bounds = L.latLngBounds(APP_DATA.bounds);
+const map = L.map("map", {
+  center: bounds.getCenter(),
+  zoom: 12,
+  minZoom: 10.5,
+  maxZoom: 16,
+  // Fractional zoom so fitBounds fills the viewport instead of dropping to
+  // the next whole level below. Safe here: with no tile layer there are no
+  // tile-seam artifacts at fractional zooms.
+  zoomSnap: 0.25,
+  zoomDelta: 0.5,
+  maxBounds: bounds.pad(0.12),
+  maxBoundsViscosity: 0.8,
+  zoomControl: true,
+  attributionControl: false,
+});
+map.fitBounds(bounds);
+
+/* Panes give explicit stacking: imagery under classification under vectors. */
+map.createPane("imagery").style.zIndex = 210;
+map.createPane("classes").style.zIndex = 230;
+const classesPane = map.getPane("classes");
+
+const imagery = L.imageOverlay("truecolor.webp", bounds, { pane: "imagery" }).addTo(map);
+const classes = L.imageOverlay("classification.png", bounds, { pane: "classes" }).addTo(map);
+
+/* ----------------------------------------------------------------------- */
+/* Swipe: clip the classification pane at a draggable divider.              */
+/* clip-path coordinates live in layer space, so they are recomputed from   */
+/* the container corners on every map move (same approach as the            */
+/* leaflet-side-by-side plugin).                                            */
+/* ----------------------------------------------------------------------- */
+const divider = document.getElementById("divider");
+let frac = 0.5;
+let mode = "swipe";
+
+function updateSwipe() {
+  if (mode !== "swipe") return;
+  const size = map.getSize();
+  const nw = map.containerPointToLayerPoint([0, 0]);
+  const se = map.containerPointToLayerPoint([size.x, size.y]);
+  const cx = nw.x + (se.x - nw.x) * frac;
+  classesPane.style.clipPath =
+    `polygon(${cx}px ${nw.y}px, ${se.x}px ${nw.y}px, ${se.x}px ${se.y}px, ${cx}px ${se.y}px)`;
+  divider.style.left = (frac * size.x) + "px";
+}
+map.on("move zoom zoomend resize viewreset", updateSwipe);
+
+divider.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  divider.setPointerCapture(e.pointerId);
+  map.dragging.disable();
+  const onMove = (ev) => {
+    const rect = map.getContainer().getBoundingClientRect();
+    frac = Math.min(0.98, Math.max(0.02, (ev.clientX - rect.left) / rect.width));
+    updateSwipe();
+  };
+  const onUp = () => {
+    divider.removeEventListener("pointermove", onMove);
+    divider.removeEventListener("pointerup", onUp);
+    map.dragging.enable();
+  };
+  divider.addEventListener("pointermove", onMove);
+  divider.addEventListener("pointerup", onUp);
+});
+
+/* ----------------------------------------------------------------------- */
+/* Communes: outlines in swipe mode, choropleth fills in forest mode.       */
+/* Sequential single-hue ramp (ColorBrewer Greens): lightness encodes       */
+/* magnitude, light = low. Partially imaged communes are hatched out of     */
+/* the ramp -- their percentages would be statistics of a fragment.         */
+/* ----------------------------------------------------------------------- */
+const GREENS = ["#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"];
+const BIN_EDGES = [30, 40, 50, 60];         // forest_pct class breaks
+const FULL = APP_DATA.full_coverage;
+
+function forestColour(p) {
+  let i = 0;
+  while (i < BIN_EDGES.length && p >= BIN_EDGES[i]) i++;
+  return GREENS[i];
+}
+
+function communeStyle(feature) {
+  const p = feature.properties;
+  if (mode === "swipe") {
+    return { color: "#1a1a19", weight: 1.4, opacity: 0.85, fillOpacity: 0 };
+  }
+  if (p.covered < FULL) {
+    return { color: "#9a988f", weight: 1, opacity: 0.8,
+             fillColor: "#d9d8d2", fillOpacity: 0.55, dashArray: "4 3" };
+  }
+  return { color: "#33322f", weight: 1.2, opacity: 0.9,
+           fillColor: forestColour(p.forest_pct), fillOpacity: 0.82 };
+}
+
+const communesLayer = L.geoJSON(APP_DATA.communes, {
+  style: communeStyle,
+  onEachFeature: (feature, layer) => {
+    const p = feature.properties;
+    const partial = p.covered < FULL
+      ? `<div class="warn">only ${Math.round(p.covered * 100)}% of this commune is imaged</div>`
+      : "";
+    layer.bindTooltip(
+      `<b>${p.commune}</b><br>` +
+      `forest ${p.forest_pct}% · built ${p.built_pct}%<br>` +
+      `${p.classified_km2} km² classified${partial}`,
+      { sticky: true, className: "commune-tip" }
+    );
+    layer.on("mouseover", () => layer.setStyle({ weight: 2.6 }));
+    layer.on("mouseout", () => communesLayer.resetStyle(layer));
+  },
+}).addTo(map);
+
+/* ----------------------------------------------------------------------- */
+/* Sidebar content, generated from APP_DATA so it can never drift from the  */
+/* pipeline outputs.                                                        */
+/* ----------------------------------------------------------------------- */
+const $ = (id) => document.getElementById(id);
+const m = APP_DATA.metrics;
+
+$("subtitle").textContent =
+  `${APP_DATA.scene.date} · scene ${APP_DATA.scene.id} · EPSG:${APP_DATA.scene.epsg} · 10 m`;
+$("gen").textContent = "generated " + APP_DATA.generated_utc.slice(0, 10);
+
+function renderClassLegend() {
+  $("legend-title").textContent = "Classes";
+  $("legend").innerHTML = APP_DATA.classes.map((c) =>
+    `<div class="row"><span class="sw" style="background:${c.colour}"></span>` +
+    `${c.name}<span class="pct">${(c.share * 100).toFixed(1)}%</span></div>`
+  ).join("");
+}
+
+function renderChoroLegend() {
+  $("legend-title").textContent = "Forest share of classified area";
+  const labels = ["under 30%", "30 – 40%", "40 – 50%", "50 – 60%", "60% and more"];
+  $("legend").innerHTML = GREENS.map((g, i) =>
+    `<div class="row"><span class="sw" style="background:${g}"></span>${labels[i]}</div>`
+  ).join("") +
+  `<div class="row"><span class="sw" style="background:#d9d8d2;border-style:dashed"></span>` +
+  `partially imaged — not rated</div>`;
+}
+
+$("stats").innerHTML = [
+  [m.blocked_accuracy.toFixed(2), "overall accuracy, spatially-blocked split"],
+  [m.kappa.toFixed(2), "Cohen's κ"],
+  [(m.n_test / 1e6).toFixed(2) + " M", "held-out test pixels"],
+  [m.random_accuracy.toFixed(2), "what a leaky random split would claim"],
+].map(([v, l]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+$("method-note").innerHTML =
+  `Validation holds out whole 2&thinsp;km blocks, so no test pixel has a training ` +
+  `neighbour. Accuracy is <b>${m.boundary_near.toFixed(2)}</b> within 20&thinsp;m of a ` +
+  `CORINE polygon edge but <b>${m.boundary_far.toFixed(2)}</b> deeper than 400&thinsp;m — ` +
+  `with ${m.boundary_within_100m_pct}% of pixels within 100&thinsp;m of an edge, much of ` +
+  `the apparent error is the 1:100&thinsp;000 label, not the model.`;
+
+/* ----------------------------------------------------------------------- */
+/* Mode switching                                                           */
+/* ----------------------------------------------------------------------- */
+function setMode(next) {
+  mode = next;
+  const swipe = mode === "swipe";
+  $("mode-swipe").classList.toggle("active", swipe);
+  $("mode-choro").classList.toggle("active", !swipe);
+  divider.style.display = swipe ? "" : "none";
+  $("label-left").style.display = swipe ? "" : "none";
+  $("label-right").style.display = swipe ? "" : "none";
+  if (swipe) {
+    map.addLayer(classes);
+    renderClassLegend();
+    updateSwipe();
+  } else {
+    map.removeLayer(classes);
+    classesPane.style.clipPath = "";
+    renderChoroLegend();
+  }
+  communesLayer.setStyle(communeStyle);
+}
+$("mode-swipe").addEventListener("click", () => setMode("swipe"));
+$("mode-choro").addEventListener("click", () => setMode("choro"));
+
+$("tg-communes").addEventListener("change", (e) => {
+  if (e.target.checked) map.addLayer(communesLayer);
+  else map.removeLayer(communesLayer);
+});
+
+renderClassLegend();
+updateSwipe();
+
+/* Deep-linkable mode (#choro), and a re-fit once layout has fully settled --
+   fitBounds during construction can see a not-yet-flexed container and pick a
+   zoom level one step too coarse. */
+if (location.hash === "#choro") setMode("choro");
+window.addEventListener("load", () => {
+  map.invalidateSize();
+  map.fitBounds(bounds);
+});
+</script>
+</body>
+</html>
