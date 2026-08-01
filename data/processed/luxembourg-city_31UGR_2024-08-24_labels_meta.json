@@ -1,0 +1,106 @@
+{
+  "generated_utc": "2026-08-01T09:49:03+00:00",
+  "source": {
+    "product": "CORINE Land Cover 2018 (CLC2018), vector",
+    "provider": "European Environment Agency",
+    "service": "https://image.discomap.eea.europa.eu/arcgis/rest/services/Corine/CLC2018_LAEA/MapServer/0/query",
+    "native_crs": "EPSG:3035",
+    "licence": "Copernicus data, free and open (Reg. (EU) No 1159/2013)",
+    "polygons": 437
+  },
+  "grid": {
+    "crs": "EPSG:32631",
+    "epsg": 32631,
+    "width": 2108,
+    "height": 2086,
+    "resolution_m": 10.0,
+    "reprojection": "EPSG:3035 -> EPSG:32631 (vector, before rasterising)",
+    "rasterisation": "pixel-centre rule (all_touched=False)"
+  },
+  "class_scheme": {
+    "name": "corine-aggregated-12",
+    "nodata": 0,
+    "classes": [
+      {
+        "class_id": 1,
+        "name": "Artificial surfaces",
+        "colour": "#e6004d",
+        "pixels": 872405,
+        "share": 0.19839614780746678,
+        "kept": true
+      },
+      {
+        "class_id": 2,
+        "name": "Arable land",
+        "colour": "#ffffa8",
+        "pixels": 606840,
+        "share": 0.13800324199824984,
+        "kept": true
+      },
+      {
+        "class_id": 4,
+        "name": "Pastures",
+        "colour": "#e6e64d",
+        "pixels": 720755,
+        "share": 0.16390898208168309,
+        "kept": true
+      },
+      {
+        "class_id": 5,
+        "name": "Heterogeneous agriculture",
+        "colour": "#ffe6a6",
+        "pixels": 618708,
+        "share": 0.14070217825168604,
+        "kept": true
+      },
+      {
+        "class_id": 6,
+        "name": "Broad-leaved forest",
+        "colour": "#80ff00",
+        "pixels": 1288778,
+        "share": 0.29308473768377236,
+        "kept": true
+      },
+      {
+        "class_id": 7,
+        "name": "Coniferous forest",
+        "colour": "#00a600",
+        "pixels": 101708,
+        "share": 0.023129710858147114,
+        "kept": true
+      },
+      {
+        "class_id": 8,
+        "name": "Mixed forest",
+        "colour": "#4dff00",
+        "pixels": 183531,
+        "share": 0.04173731627312107,
+        "kept": true
+      },
+      {
+        "class_id": 11,
+        "name": "Wetlands",
+        "colour": "#a6a6ff",
+        "pixels": 4563,
+        "share": 0.0010376850458737295,
+        "kept": false
+      }
+    ],
+    "min_class_share": 0.005
+  },
+  "limitations": {
+    "clc_minimum_mapping_unit_ha": 25.0,
+    "min_polygon_area_ha": 25.022504785277956,
+    "median_polygon_area_ha": 78.19757121003303,
+    "boundary_buffer_m": 100.0,
+    "fraction_within_boundary_buffer": 0.4954503184242128,
+    "unlabelled_pixels": 0,
+    "note": "CLC has a 25 ha minimum mapping unit and is photo-interpreted at 1:100 000, so pixels near polygon edges are frequently mislabelled. Classes 5 (heterogeneous agriculture) are mosaics by definition and cannot be reproduced per-pixel."
+  },
+  "files": {
+    "labels": "luxembourg-city_31UGR_2024-08-24_labels.tif",
+    "clc_level3": "luxembourg-city_31UGR_2024-08-24_labels_clc3.tif",
+    "boundary_distance": "luxembourg-city_31UGR_2024-08-24_label_boundary_dist.tif",
+    "vector": "data/raw/clc2018_luxembourg-city_31UGR_2024-08-24.gpkg"
+  }
+}

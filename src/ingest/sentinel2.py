@@ -273,6 +273,19 @@ class TargetGrid:
         return (self.height, self.width)
 
 
+def grid_from_raster(path: Path | str) -> TargetGrid:
+    """Recover the canonical grid from an already-written raster.
+
+    Downstream stages (labels, predictions) must land on *exactly* this grid.
+    Reading it back from the GeoTIFF rather than recomputing it from metadata
+    removes any chance of the two drifting apart.
+    """
+    with rasterio.open(path) as src:
+        return TargetGrid(
+            crs=src.crs, transform=src.transform, width=src.width, height=src.height
+        )
+
+
 def build_target_grid(item, bbox: tuple[float, float, float, float]) -> TargetGrid:
     """Snap the WGS84 AOI onto the scene's native 10 m pixel grid.
 
