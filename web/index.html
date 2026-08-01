@@ -137,7 +137,12 @@
 
   <section class="toggles">
     <h2>Layers</h2>
-    <label><input type="checkbox" id="tg-communes" checked> Commune boundaries</label>
+    <label><input type="radio" name="cls" id="cls-crf" checked>
+      Classification + CRF smoothing (thesis method)</label>
+    <label><input type="radio" name="cls" id="cls-rf">
+      Classification, raw per-pixel</label>
+    <label style="margin-top:6px"><input type="checkbox" id="tg-communes" checked>
+      Commune boundaries</label>
   </section>
 
   <footer>
@@ -153,7 +158,7 @@
 <div id="mapwrap">
   <div id="map"></div>
   <div class="swipe-label" id="label-left">Sentinel-2, true colour</div>
-  <div class="swipe-label" id="label-right">Random Forest classification</div>
+  <div class="swipe-label" id="label-right">RF + mean-field CRF</div>
   <div id="divider"><div class="grip">⇆</div></div>
 </div>
 
@@ -190,8 +195,26 @@ map.createPane("imagery").style.zIndex = 210;
 map.createPane("classes").style.zIndex = 230;
 const classesPane = map.getPane("classes");
 
-const imagery = L.imageOverlay("truecolor.webp", bounds, { pane: "imagery" }).addTo(map);
-const classes = L.imageOverlay("classification.png", bounds, { pane: "classes" }).addTo(map);
+const imagery = L.imageOverlay(APP_DATA.layers.truecolor, bounds, { pane: "imagery" }).addTo(map);
+/* Two candidate classification layers share one pane (so the swipe clip
+   applies to whichever is active): the raw per-pixel Random Forest, and the
+   same probabilities smoothed by the mean-field CRF. */
+const classLayers = {
+  rf: L.imageOverlay(APP_DATA.layers.rf, bounds, { pane: "classes" }),
+  crf: L.imageOverlay(APP_DATA.layers.crf, bounds, { pane: "classes" }),
+};
+let activeClass = "crf";
+let classes = classLayers[activeClass].addTo(map);
+
+function setClassLayer(which) {
+  if (which === activeClass) return;
+  map.removeLayer(classLayers[activeClass]);
+  activeClass = which;
+  classes = classLayers[activeClass];
+  if (mode === "swipe") map.addLayer(classes);
+  document.getElementById("label-right").textContent =
+    which === "crf" ? "RF + mean-field CRF" : "Random Forest, per-pixel";
+}
 
 /* ----------------------------------------------------------------------- */
 /* Swipe: clip the classification pane at a draggable divider.              */
@@ -309,11 +332,14 @@ function renderChoroLegend() {
   `partially imaged — not rated</div>`;
 }
 
+const speckleCut = 1 - m.crf.speckle_after_km2 / m.crf.speckle_before_km2;
 $("stats").innerHTML = [
   [m.blocked_accuracy.toFixed(2), "overall accuracy, spatially-blocked split"],
   [m.kappa.toFixed(2), "Cohen's κ"],
   [(m.n_test / 1e6).toFixed(2) + " M", "held-out test pixels"],
   [m.random_accuracy.toFixed(2), "what a leaky random split would claim"],
+  ["−" + Math.round(100 * speckleCut) + "%", "map area lost to speckle, after CRF smoothing"],
+  [Math.round(100 * m.crf.road_survival) + "%", "of thin roads survive the smoothing"],
 ].map(([v, l]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 
 $("method-note").innerHTML =
@@ -321,7 +347,12 @@ $("method-note").innerHTML =
   `neighbour. Accuracy is <b>${m.boundary_near.toFixed(2)}</b> within 20&thinsp;m of a ` +
   `CORINE polygon edge but <b>${m.boundary_far.toFixed(2)}</b> deeper than 400&thinsp;m — ` +
   `with ${m.boundary_within_100m_pct}% of pixels within 100&thinsp;m of an edge, much of ` +
-  `the apparent error is the 1:100&thinsp;000 label, not the model.`;
+  `the apparent error is the 1:100&thinsp;000 label, not the model. ` +
+  `The CRF layer applies mean-field smoothing (θ=${m.crf.theta}) over the classifier's ` +
+  `probabilities: speckle patches drop ${(m.crf.patches_before / 1000).toFixed(0)}k → ` +
+  `${(m.crf.patches_after / 1000).toFixed(0)}k while accuracy holds ` +
+  `(${m.crf.unary_accuracy.toFixed(2)} → ${m.crf.crf_accuracy.toFixed(2)}). ` +
+  `Toggle the raw layer to see the difference.`;
 
 /* ----------------------------------------------------------------------- */
 /* Mode switching                                                           */
@@ -352,14 +383,20 @@ $("tg-communes").addEventListener("change", (e) => {
   if (e.target.checked) map.addLayer(communesLayer);
   else map.removeLayer(communesLayer);
 });
+$("cls-crf").addEventListener("change", () => setClassLayer("crf"));
+$("cls-rf").addEventListener("change", () => setClassLayer("rf"));
 
 renderClassLegend();
 updateSwipe();
 
-/* Deep-linkable mode (#choro), and a re-fit once layout has fully settled --
-   fitBounds during construction can see a not-yet-flexed container and pick a
-   zoom level one step too coarse. */
+/* Deep-linkable views (#choro, #raw), and a re-fit once layout has fully
+   settled -- fitBounds during construction can see a not-yet-flexed container
+   and pick a zoom level one step too coarse. */
 if (location.hash === "#choro") setMode("choro");
+if (location.hash === "#raw") {
+  setClassLayer("rf");
+  document.getElementById("cls-rf").checked = true;
+}
 window.addEventListener("load", () => {
   map.invalidateSize();
   map.fitBounds(bounds);

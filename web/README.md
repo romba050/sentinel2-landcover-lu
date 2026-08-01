@@ -1,8 +1,10 @@
 # Interactive web demo
 
 A fully static, self-contained demo of the project: a swipe comparison between
-the Sentinel-2 scene and the Random Forest classification, plus a per-commune
-forest choropleth, with the honest headline numbers alongside.
+the Sentinel-2 scene and the classification (with a toggle between the raw
+per-pixel Random Forest and the mean-field-CRF-smoothed map — the thesis
+method), plus a per-commune forest choropleth, with the honest headline
+numbers alongside.
 
 Everything in this folder is generated or vendored — there is **no server, no
 database and no external request** at view time (even the map library is
@@ -18,7 +20,8 @@ open web/index.html            # macOS
 python3 -m http.server -d web 8000   # then http://localhost:8000
 ```
 
-Deep link: `index.html#choro` opens directly in choropleth mode.
+Deep links: `index.html#choro` opens directly in choropleth mode;
+`index.html#raw` opens the swipe with the raw (un-smoothed) classification.
 
 ## Put it on your website
 
@@ -60,8 +63,14 @@ model results. `vendor/` is Leaflet 1.9.4, vendored deliberately.
 | `index.html` | hand-written page (map logic, layout, swipe) |
 | `data.js` | generated — bounds, legend, metrics, commune GeoJSON |
 | `truecolor.webp` | generated — stretched scene, warped to EPSG:3857 |
-| `classification.png` | generated — RF prediction, class colours, warped |
+| `classification_rf.png` | generated — out-of-fold RF map, class colours, warped |
+| `classification_crf.png` | generated — the same probabilities after mean-field CRF |
 | `vendor/leaflet.{js,css}` | Leaflet 1.9.4, vendored |
+
+The displayed pair is deliberately out-of-fold unary vs the CRF on top of it:
+the identical model underneath, so every visible difference between the two
+classification layers is the smoothing and nothing else. Commune statistics
+are computed from the CRF map (the end product a per-commune report would use).
 
 Note the rasters here are warped to Web-Mercator *for display only* — the
 analysis rasters in `data/` remain in the scene's native UTM CRS. The warp is

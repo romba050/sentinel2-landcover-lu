@@ -219,20 +219,30 @@ def build(out_dir: Path = WEB) -> dict:
     ingest = json.loads((PROCESSED / "latest_ingest.json").read_text())
     labels_meta = json.loads((PROCESSED / "latest_labels.json").read_text())
     rf = json.loads((RESULTS / "latest_rf.json").read_text())
+    crf = json.loads((RESULTS / "latest_crf.json").read_text())
 
     kept = [c for c in labels_meta["class_scheme"]["classes"] if c["kept"]]
-    pred_path = RESULTS / rf["files"]["prediction"]
     stack_path = PROCESSED / ingest["files"]["stack"]
+    # The displayed pair is out-of-fold unary vs the CRF on top of it -- the
+    # identical model underneath, so every visible difference is the smoothing.
+    unary_path = RESULTS / crf["files"]["unary"]
+    crf_path = RESULTS / crf["files"]["crf"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    bounds4326 = export_classification(pred_path, kept, out_dir / "classification.png")
+    bounds4326 = export_classification(unary_path, kept, out_dir / "classification_rf.png")
+    export_classification(crf_path, kept, out_dir / "classification_crf.png")
     export_truecolor(stack_path, out_dir / "truecolor.webp")
-    communes = commune_stats(pred_path, RAW / "communes4326.geojson")
+    # Commune statistics from the CRF map: it is the end product a per-commune
+    # report would be built from (and loses half as much area to speckle).
+    communes = commune_stats(crf_path, RAW / "communes4326.geojson")
 
     west, south, east, north = bounds4326
     blocked = rf["spatial_block_split"]
     random_ = rf["random_pixel_split"]
     boundary = rf["accuracy_by_boundary_distance"]
+    theta = crf["method"]["theta_chosen"]
+    crf_res = crf["results"][f"{theta:g}"]
+    unary_res = crf["results"]["unary"]
 
     data = {
         "generated_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -264,8 +274,27 @@ def build(out_dir: Path = WEB) -> dict:
             "boundary_within_100m_pct": round(
                 100 * labels_meta["limitations"]["fraction_within_boundary_buffer"], 1
             ),
+            "crf": {
+                "theta": theta,
+                "unary_accuracy": round(unary_res["overall_accuracy"], 3),
+                "crf_accuracy": round(crf_res["overall_accuracy"], 3),
+                "speckle_before_km2": round(
+                    unary_res["vectorisation"]["dropped_speck_area_km2"], 1
+                ),
+                "speckle_after_km2": round(
+                    crf_res["vectorisation"]["dropped_speck_area_km2"], 1
+                ),
+                "road_survival": round(crf_res["thin_artificial_retention"], 3),
+                "patches_before": unary_res["fragmentation"]["n_patches"],
+                "patches_after": crf_res["fragmentation"]["n_patches"],
+            },
         },
         "full_coverage": FULL_COVERAGE,
+        "layers": {
+            "truecolor": "truecolor.webp",
+            "rf": "classification_rf.png",
+            "crf": "classification_crf.png",
+        },
         "communes": json.loads(communes.to_json(to_wgs84=False)),
     }
 
