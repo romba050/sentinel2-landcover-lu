@@ -133,17 +133,30 @@ def spatial_block_folds(
     n_folds: int = 5,
     block_size_m: float = DEFAULT_BLOCK_SIZE_M,
     seed: int = 42,
+    assign: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Fold index per pixel for spatially-blocked K-fold CV (-1 = not eligible)."""
+    """Fold index per pixel for spatially-blocked K-fold CV (-1 = unassigned).
+
+    ``assign`` optionally widens *which pixels receive a fold index* beyond the
+    eligible ones -- e.g. pass the cloud-free mask so that valid-but-unlabelled
+    pixels also get an out-of-fold prediction. Fold balance is still decided by
+    the blocks that contain eligible pixels; blocks holding only ``assign``
+    pixels are appended round-robin afterwards, so they cannot skew the
+    train/test balance of the labelled data.
+    """
     blocks = block_ids(eligible.shape, transform, block_size_m)
     present = np.unique(blocks[eligible])
     rng = np.random.default_rng(seed)
-    shuffled = rng.permutation(present)
+    order = rng.permutation(present).tolist()
+    if assign is not None:
+        extra = np.setdiff1d(np.unique(blocks[assign]), present)
+        order += rng.permutation(extra).tolist()
 
-    fold_of_block = {b: i % n_folds for i, b in enumerate(shuffled.tolist())}
+    fold_of_block = {b: i % n_folds for i, b in enumerate(order)}
+    target = eligible if assign is None else (eligible | assign)
     folds = np.full(eligible.shape, -1, dtype=np.int8)
     for block, fold in fold_of_block.items():
-        folds[eligible & (blocks == block)] = fold
+        folds[target & (blocks == block)] = fold
     return folds
 
 

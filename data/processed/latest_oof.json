@@ -1,0 +1,28 @@
+{
+  "proba_raster": "luxembourg-city_31UGR_2024-08-24_rf_proba_oof.tif",
+  "class_ids": [
+    1,
+    2,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "class_names": [
+    "Artificial surfaces",
+    "Arable land",
+    "Pastures",
+    "Heterogeneous agriculture",
+    "Broad-leaved forest",
+    "Coniferous forest",
+    "Mixed forest"
+  ],
+  "n_folds": 5,
+  "block_size_m": 2000.0,
+  "n_trees": 300,
+  "min_samples_leaf": 20,
+  "max_train_pixels": 300000,
+  "seed": 42,
+  "oof_unary_accuracy_all_labelled": 0.6263606526625254
+}

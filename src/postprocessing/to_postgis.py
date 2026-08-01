@@ -64,7 +64,16 @@ def vectorise_prediction(
     with rasterio.open(raster_path) as src:
         data = src.read(1)
         crs, transform = src.crs, src.transform
+    return vectorise_array(data, transform, crs, class_names, min_area_m2,
+                           source=raster_path.name)
 
+
+def vectorise_array(
+    data, transform, crs, class_names: dict[int, str], min_area_m2: float,
+    source: str = "array",
+) -> gpd.GeoDataFrame:
+    """Array-based core of :func:`vectorise_prediction` (reused by the CRF
+    sweep, which compares several candidate maps without writing them all)."""
     records = []
     dropped_n, dropped_area = 0, 0.0
     # mask=data > 0 keeps nodata out of the polygonisation entirely.
@@ -86,7 +95,7 @@ def vectorise_prediction(
     log.info(
         "Vectorised %s -> %d polygons >= %.0f m2; dropped %d specks "
         "totalling %.1f km2 (%.1f%% of the classified area)",
-        raster_path.name, len(gdf), min_area_m2, dropped_n,
+        source, len(gdf), min_area_m2, dropped_n,
         dropped_area / 1e6, 100 * dropped_area / total,
     )
     gdf.attrs["dropped_speck_area_km2"] = dropped_area / 1e6

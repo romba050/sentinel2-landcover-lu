@@ -1,0 +1,921 @@
+{
+  "generated_utc": "2026-08-01T22:39:36+00:00",
+  "method": {
+    "unary": "RandomForest predict_proba, out-of-fold (see latest_oof.json)",
+    "pairwise": "contrast-sensitive Potts, 8-neighbour grid",
+    "contrast_bands": [
+      "B11",
+      "B12",
+      "NBR2"
+    ],
+    "sigma": 0.13764534890651703,
+    "n_iters": 8,
+    "theta_sweep": [
+      0.3,
+      0.8,
+      2.0,
+      5.0,
+      12.0
+    ],
+    "theta_chosen": 0.8,
+    "selection_rule": "road-safe thetas (>= 75% of the unary map's thin artificial pixels surviving) ranked by minimum speckle-area loss at the vectorisation stage; NOT accuracy-tuned",
+    "ablation": "uniform kernels (contrast term removed) at chosen theta"
+  },
+  "results": {
+    "unary": {
+      "overall_accuracy": 0.6263606526625254,
+      "macro_f1": 0.41779314457405237,
+      "kappa": 0.5245515993610959,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7338941182203184,
+          "recall": 0.7942161995476498,
+          "f1": 0.7628645532538303,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5575165340827086,
+          "recall": 0.5410668380462725,
+          "f1": 0.5491685308691017,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.5024282780736915,
+          "recall": 0.6853799141178347,
+          "f1": 0.5798145733296869,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.28750027966082736,
+          "recall": 0.10384866528313841,
+          "f1": 0.15258260280007077,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.7152383266632059,
+          "recall": 0.9044156557607284,
+          "f1": 0.7987789333450291,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.2864820173625465,
+          "recall": 0.020440869941400874,
+          "f1": 0.03815904189418621,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.2680181580747466,
+          "recall": 0.023483771134031852,
+          "f1": 0.04318377652646133,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.43866105955706947
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5623979816797727
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6167585552595516
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6559277606897986
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7068335718986828
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8057988260619593
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 83868,
+        "mean_patch_ha": 0.5243019983784042,
+        "edge_density_km_per_km2": 22.711074461659376,
+        "tiny_patch_pixel_share": 0.02372182762911806,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6821,
+        "dropped_speck_area_km2": 28.9086,
+        "dropped_speck_count": 122103
+      },
+      "artificial_km2": 94.4951,
+      "thin_artificial_retention": 1.0
+    },
+    "0.3": {
+      "overall_accuracy": 0.6288643787706427,
+      "macro_f1": 0.41533095494654126,
+      "kappa": 0.5274441123806717,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7356554879502814,
+          "recall": 0.795713334242772,
+          "f1": 0.7645067245558907,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5613606828895401,
+          "recall": 0.5445570496341705,
+          "f1": 0.5528312066347976,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.502521856252707,
+          "recall": 0.7034762159124807,
+          "f1": 0.5862566151789813,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.2856735465012655,
+          "recall": 0.09066958888522535,
+          "f1": 0.13765046087557156,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.7145560451149595,
+          "recall": 0.907414620671675,
+          "f1": 0.7995195182055632,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.27387880862718245,
+          "recall": 0.01573130923821135,
+          "f1": 0.029753602975360297,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.2860199714693295,
+          "recall": 0.019664252905503703,
+          "f1": 0.03679855619962376,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4406149933799556
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5650464429734015
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6193202461597664
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6586188988191517
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7095954991963774
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8073431295209317
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 64863,
+        "mean_patch_ha": 0.677923623637513,
+        "edge_density_km_per_km2": 19.241879407334093,
+        "tiny_patch_pixel_share": 0.017829917838923535,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6667,
+        "dropped_speck_area_km2": 22.7452,
+        "dropped_speck_count": 90883
+      },
+      "artificial_km2": 94.4467,
+      "thin_artificial_retention": 0.937419917521777,
+      "convergence_mean_abs_dQ": [
+        0.019574632868170738,
+        0.004374779295176268,
+        0.0014223825419321656,
+        0.0005696153966709971,
+        0.00025654223281890154,
+        0.00012474579853005707,
+        6.422203296096995e-05,
+        3.462428867351264e-05
+      ]
+    },
+    "0.8": {
+      "overall_accuracy": 0.6314778335552569,
+      "macro_f1": 0.4129903698644692,
+      "kappa": 0.530469186438213,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7391888359202481,
+          "recall": 0.7973904460796508,
+          "f1": 0.7671873785053197,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5678763899311003,
+          "recall": 0.5487113571946477,
+          "f1": 0.5581293999329534,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.49997937691423,
+          "recall": 0.723184716026944,
+          "f1": 0.5912165764179856,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.28132037599138354,
+          "recall": 0.07429999288840616,
+          "f1": 0.117552894966987,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.713632889247255,
+          "recall": 0.9106067918601962,
+          "f1": 0.80017618508161,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.2583804962995211,
+          "recall": 0.011670665041098045,
+          "f1": 0.022332599574796334,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.32455370207784606,
+          "recall": 0.01812772774081763,
+          "f1": 0.03433755457163204,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4438734939641915
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5684833106058172
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6222442377306469
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6607723339109633
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7117496990456093
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8088941182762632
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 44828,
+        "mean_patch_ha": 0.9809083608458999,
+        "edge_density_km_per_km2": 15.332360293422019,
+        "tiny_patch_pixel_share": 0.01169057876620116,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6247,
+        "dropped_speck_area_km2": 15.2889,
+        "dropped_speck_count": 58344
+      },
+      "artificial_km2": 94.1915,
+      "thin_artificial_retention": 0.8231671206916973,
+      "convergence_mean_abs_dQ": [
+        0.03880373388528824,
+        0.012472352012991905,
+        0.005379167851060629,
+        0.0026847939006984234,
+        0.0014860546216368675,
+        0.000892471638508141,
+        0.0005733133875764906,
+        0.00039111668593250215
+      ]
+    },
+    "2": {
+      "overall_accuracy": 0.6333473188071082,
+      "macro_f1": 0.412636414676796,
+      "kappa": 0.5326656560625602,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7441278350823979,
+          "recall": 0.798133281671105,
+          "f1": 0.7701850024557848,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5764159292798768,
+          "recall": 0.5505767582888406,
+          "f1": 0.5632001294588939,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.49668987242617296,
+          "recall": 0.7345866487225201,
+          "f1": 0.5926560647799383,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.28390647625191295,
+          "recall": 0.06686514478558545,
+          "f1": 0.1082382182686333,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.7124604276118988,
+          "recall": 0.9129268190487423,
+          "f1": 0.8003314080556918,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.24864610313162233,
+          "recall": 0.010382664097219491,
+          "f1": 0.019932990420461517,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.3270879011361371,
+          "recall": 0.017882537554963468,
+          "f1": 0.03391108929816857,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4467820362517911
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5708806498804251
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6241079369433081
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6623294869351276
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7134565080498027
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8094022007995615
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 25477,
+        "mean_patch_ha": 1.7259551752561135,
+        "edge_density_km_per_km2": 12.660192267107186,
+        "tiny_patch_pixel_share": 0.005360664565943542,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6213,
+        "dropped_speck_area_km2": 9.6107,
+        "dropped_speck_count": 30090
+      },
+      "artificial_km2": 93.6506,
+      "thin_artificial_retention": 0.6767951934361979,
+      "convergence_mean_abs_dQ": [
+        0.060092322528362274,
+        0.01796654798090458,
+        0.006883527617901564,
+        0.0032302485778927803,
+        0.0017970108892768621,
+        0.0011308026732876897,
+        0.0007801604806445539,
+        0.000575782498344779
+      ]
+    },
+    "5": {
+      "overall_accuracy": 0.6338329023485352,
+      "macro_f1": 0.4127634548140861,
+      "kappa": 0.5332343071094381,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7463124788289118,
+          "recall": 0.798109208295456,
+          "f1": 0.7713422656324005,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5789941120357883,
+          "recall": 0.5511139674378749,
+          "f1": 0.5647101334871025,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.49628607899154165,
+          "recall": 0.7363195538012224,
+          "f1": 0.5929311606549318,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.2835246660311935,
+          "recall": 0.0663430891470613,
+          "f1": 0.10752578318807778,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.7119106606742769,
+          "recall": 0.9137105071625989,
+          "f1": 0.8002851632212842,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.24593301435406698,
+          "recall": 0.010107366185550793,
+          "f1": 0.01941674221819281,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.3283765767613578,
+          "recall": 0.017446643891222736,
+          "f1": 0.033132935296613236,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4474644549302319
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5714719546345153
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6245899810559734
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6628497036950254
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7139375178600753
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8091982992606063
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 19200,
+        "mean_patch_ha": 2.290216666666667,
+        "edge_density_km_per_km2": 12.151484029895279,
+        "tiny_patch_pixel_share": 0.0032272692540007133,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6174,
+        "dropped_speck_area_km2": 8.6275,
+        "dropped_speck_count": 22626
+      },
+      "artificial_km2": 93.3727,
+      "thin_artificial_retention": 0.610500360707633,
+      "convergence_mean_abs_dQ": [
+        0.07907521724700928,
+        0.01784048043191433,
+        0.00599207216873765,
+        0.003027864033356309,
+        0.002003038302063942,
+        0.0015429389895871282,
+        0.0013013951247557998,
+        0.0011468013981357217
+      ]
+    },
+    "12": {
+      "overall_accuracy": 0.6338237962343031,
+      "macro_f1": 0.41308299386097463,
+      "kappa": 0.5332488573390206,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.746938955123279,
+          "recall": 0.7977790591436985,
+          "f1": 0.7715223767087334,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.5784333559851915,
+          "recall": 0.5512474457847208,
+          "f1": 0.5645132847153842,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.4967277266133657,
+          "recall": 0.7354537949788763,
+          "f1": 0.5929650545918879,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.2843003851960167,
+          "recall": 0.06787693063609974,
+          "f1": 0.10958932707048961,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.711979207924983,
+          "recall": 0.9135824789063749,
+          "f1": 0.8002793557146426,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.24685795589281478,
+          "recall": 0.01023518307311126,
+          "f1": 0.019655416568326645,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.32489580156551795,
+          "recall": 0.017413951866442182,
+          "f1": 0.03305614165735799,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4472194841225865
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5713434736015277
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6245705355397513
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.6628374633006748
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7141612132825945
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8093119492987124
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 21650,
+        "mean_patch_ha": 2.031046651270208,
+        "edge_density_km_per_km2": 12.494473776134718,
+        "tiny_patch_pixel_share": 0.003795128554066937,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 6165,
+        "dropped_speck_area_km2": 9.262,
+        "dropped_speck_count": 26052
+      },
+      "artificial_km2": 93.2564,
+      "thin_artificial_retention": 0.5990223208036781,
+      "convergence_mean_abs_dQ": [
+        0.09223661571741104,
+        0.014417944476008415,
+        0.005615844391286373,
+        0.003862708806991577,
+        0.0032583903521299362,
+        0.002943105762824416,
+        0.0027477354742586613,
+        0.002611801726743579
+      ]
+    },
+    "ablation": {
+      "overall_accuracy": 0.6464605786070514,
+      "macro_f1": 0.4157940450070138,
+      "kappa": 0.548879097957035,
+      "per_class": [
+        {
+          "class_id": 1,
+          "name": "Artificial surfaces",
+          "precision": 0.7541874848449213,
+          "recall": 0.8307584374315772,
+          "f1": 0.7906233362716776,
+          "support": 872333
+        },
+        {
+          "class_id": 2,
+          "name": "Arable land",
+          "precision": 0.6007169984228781,
+          "recall": 0.5768274998352119,
+          "f1": 0.5885299193726687,
+          "support": 606840
+        },
+        {
+          "class_id": 4,
+          "name": "Pastures",
+          "precision": 0.5050720166718549,
+          "recall": 0.7518713016212166,
+          "f1": 0.604242290102977,
+          "support": 720755
+        },
+        {
+          "class_id": 5,
+          "name": "Heterogeneous agriculture",
+          "precision": 0.2994194870238276,
+          "recall": 0.05101922069861712,
+          "f1": 0.08718299978456967,
+          "support": 618708
+        },
+        {
+          "class_id": 6,
+          "name": "Broad-leaved forest",
+          "precision": 0.715251893874442,
+          "recall": 0.9224226360164435,
+          "f1": 0.80573340468008,
+          "support": 1288778
+        },
+        {
+          "class_id": 7,
+          "name": "Coniferous forest",
+          "precision": 0.2434077079107505,
+          "recall": 0.007079089157195108,
+          "f1": 0.01375804941432748,
+          "support": 101708
+        },
+        {
+          "class_id": 8,
+          "name": "Mixed forest",
+          "precision": 0.34300884955752214,
+          "recall": 0.010559524004119195,
+          "f1": 0.02048831542279616,
+          "support": 183531
+        }
+      ],
+      "accuracy_by_boundary_distance": [
+        {
+          "min_distance_m": 0.0,
+          "max_distance_m": 20.0,
+          "n_pixels": 514347,
+          "accuracy": 0.4599035281628939
+        },
+        {
+          "min_distance_m": 20.0,
+          "max_distance_m": 50.0,
+          "n_pixels": 684926,
+          "accuracy": 0.5831885488359326
+        },
+        {
+          "min_distance_m": 50.0,
+          "max_distance_m": 100.0,
+          "n_pixels": 977089,
+          "accuracy": 0.6376041486497136
+        },
+        {
+          "min_distance_m": 100.0,
+          "max_distance_m": 200.0,
+          "n_pixels": 1143754,
+          "accuracy": 0.675743210515548
+        },
+        {
+          "min_distance_m": 200.0,
+          "max_distance_m": 400.0,
+          "n_pixels": 773373,
+          "accuracy": 0.7263054179548549
+        },
+        {
+          "min_distance_m": 400.0,
+          "max_distance_m": null,
+          "n_pixels": 299164,
+          "accuracy": 0.8226290596462141
+        }
+      ],
+      "fragmentation": {
+        "n_patches": 7589,
+        "mean_patch_ha": 5.794196863881935,
+        "edge_density_km_per_km2": 8.518048692627335,
+        "tiny_patch_pixel_share": 0.00039957100128808773,
+        "tiny_threshold_px": 5
+      },
+      "vectorisation": {
+        "n_polygons": 4695,
+        "dropped_speck_area_km2": 2.6977,
+        "dropped_speck_count": 3143
+      },
+      "artificial_km2": 96.1843,
+      "thin_artificial_retention": 0.47514347549879943
+    }
+  },
+  "files": {
+    "unary": "luxembourg-city_31UGR_2024-08-24_unary_oof.tif",
+    "crf": "luxembourg-city_31UGR_2024-08-24_crf_labels.tif",
+    "sweep": {
+      "0.3": "luxembourg-city_31UGR_2024-08-24_crf_theta_0.3.tif",
+      "0.8": "luxembourg-city_31UGR_2024-08-24_crf_theta_0.8.tif",
+      "2": "luxembourg-city_31UGR_2024-08-24_crf_theta_2.tif",
+      "5": "luxembourg-city_31UGR_2024-08-24_crf_theta_5.tif",
+      "12": "luxembourg-city_31UGR_2024-08-24_crf_theta_12.tif"
+    },
+    "ablation": "luxembourg-city_31UGR_2024-08-24_crf_ablation.tif"
+  },
+  "oof": {
+    "proba_raster": "luxembourg-city_31UGR_2024-08-24_rf_proba_oof.tif",
+    "class_ids": [
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "class_names": [
+      "Artificial surfaces",
+      "Arable land",
+      "Pastures",
+      "Heterogeneous agriculture",
+      "Broad-leaved forest",
+      "Coniferous forest",
+      "Mixed forest"
+    ],
+    "n_folds": 5,
+    "block_size_m": 2000.0,
+    "n_trees": 300,
+    "min_samples_leaf": 20,
+    "max_train_pixels": 300000,
+    "seed": 42,
+    "oof_unary_accuracy_all_labelled": 0.6263606526625254
+  }
+}

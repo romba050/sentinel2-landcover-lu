@@ -137,6 +137,66 @@ suggests.
 
 ---
 
+## Spatial post-processing: the thesis method
+
+My MSc thesis was mean-field networks for retinal vessel segmentation — a
+neural unary potential plus mean-field message passing over a CRF. The same
+machinery is applied here with the unary swapped for the Random Forest:
+a hand-rolled (~90-line, [crf.py](src/postprocessing/crf.py)) **mean-field CRF
+with a contrast-sensitive Potts pairwise term** over an 8-neighbour grid,
+
+> w_ij = (θ / d_ij) · exp(−‖f_i − f_j‖² / 2σ²),
+
+with `f` the standardised SWIR/NBR2 features and σ set to the median
+4-neighbour feature distance. Where the imagery changes sharply, w_ij collapses
+and the CRF leaves the boundary alone — the contrast term is the geospatial
+adaptation, and the ablation below shows it is what makes the method usable.
+
+**No leakage:** the unary is the RF's `predict_proba` assembled **out-of-fold**
+from a 5-fold spatially-blocked CV ([oof.py](src/models/oof.py)), so no pixel is
+smoothed toward probabilities its own training block produced. Sanity check:
+OOF argmax accuracy over all 4.39 M labelled pixels is 0.626 — blocked-split
+territory, not the leaky 0.647.
+
+| | RF unary | + CRF (θ=0.8) | θ=0.8, contrast term removed |
+|---|---:|---:|---:|
+| Overall accuracy (all OOF pixels) | 0.626 | 0.632 | **0.647** |
+| Patches | 83,868 | 44,828 | 7,589 |
+| Pixels in sub-5-px specks | 2.37% | 1.17% | 0.04% |
+| Area lost to the 2000 m² speckle filter | 28.9 km² | 15.3 km² | 2.7 km² |
+| **Thin-structure (road) survival** | 100% | **82%** | **48%** |
+
+![Theta sweep road survival](data/results/figures/fig7_crf_theta_sweep.jpg)
+
+Two findings, both measured rather than asserted:
+
+**1. The gain is structural, not score.** The earlier prediction — that a CRF
+would improve the map's appearance more than its CORINE-measured score — is
+confirmed: accuracy rises a uniform ~+0.005 at *every* distance from a CORINE
+boundary (the expected concentration deep inside polygons did not materialise),
+while patch count and speckle drop by half. The area the pre-PostGIS speckle
+filter throws away falls **28.9 → 15.3 km²**, which is the commercially
+relevant number: per-commune statistics discard half as much classified area.
+
+![CRF boundary distance](data/results/figures/fig6_crf_boundary_distance.png)
+
+**2. Agreement with coarse labels is a trap, demonstrated live.** Remove the
+contrast term (uniform smoothing at the same θ) and every CORINE-derived
+metric *improves* — accuracy 0.647, specks 0.04% — while **half the road
+network is erased** (thin-structure survival 48%). CORINE's 25 ha polygons
+reward exactly the blobs over-smoothing produces. This is why θ was **not**
+tuned on accuracy: the rule is thin-structure survival ≥ 75% (a 3×3-opening
+residue tracks roads/railways — class *area* can't, because urban
+consolidation masks road loss), then minimum speckle-area loss. Chosen: θ=0.8.
+
+Honest per-class ledger: the five viable classes all gain slightly (pastures
++0.011 F1); the three already-failing ones lose (heterogeneous agriculture
+−0.035, coniferous −0.016, mixed −0.009) — smoothing eats minority specks, so
+macro-F1 dips 0.418 → 0.413. The CRF makes the map more usable; it does not
+rescue classes the single-date spectra cannot separate.
+
+---
+
 ## Pipeline
 
 ```bash
@@ -148,12 +208,15 @@ uv run python -m src.labels.corine               # CORINE -> 10 m label raster
 uv run python -m src.labels.preview              # label/imagery overlay check
 uv run python -m src.models.random_forest        # train + evaluate (~5 min)
 uv run python -m src.evaluation.figures          # result figures
+uv run python -m src.models.oof                  # out-of-fold probabilities (~3 min)
+uv run python -m src.postprocessing.crf_pipeline # mean-field CRF sweep + evaluation
+uv run python -m src.evaluation.crf_figures      # CRF figures
 
 docker compose -f docker/docker-compose.yml up -d
 uv run python -m src.postprocessing.to_postgis   # load + spatial analysis
 uv run python -m src.postprocessing.qgis_styles  # QGIS .qml styles
 uv run python -m src.postprocessing.web_export   # static web demo -> web/
-uv run pytest                                    # 68 tests
+uv run pytest                                    # 86 tests
 ```
 
 ### 1. Imagery — `src/ingest/sentinel2.py`
@@ -274,22 +337,24 @@ pair exceeds |r| = 0.99, so it cannot come back.
 - **One AOI, one scene.** Nothing here demonstrates generalisation to another
   region or season; the blocked split only demonstrates generalisation to unseen
   ground *within* this scene.
-- **No spatial context in the model.** A per-pixel classifier produces
-  salt-and-pepper noise, and no CRF or morphological filter has been applied.
+- **No spatial context in the classifier itself.** The RF stays per-pixel; the
+  CRF adds spatial context as pure post-processing over its probabilities. A
+  model with learned spatial features (a CNN unary) remains future work.
 - **Speckle filtering discards area.** Polygons below 2000 m² are dropped before
   loading to PostGIS; the loader reports how much area that removes rather than
   letting the totals silently not add up.
 
 ## Not done
 
-- **CNN / U-Net + CRF post-processing.** The direct link to my thesis and the
-  natural next step, since it would add the spatial context the Random Forest
-  lacks. Not written. Given the boundary-distance analysis above, I would expect
-  it to improve the map's appearance more than its CORINE-measured score,
-  because CORINE cannot resolve the boundaries a CNN would sharpen.
-- **QGIS print layout.** Styles are generated (`qgis/*.qml`) and the layout steps
-  documented in `qgis/README.md`, but QGIS is not installed on the machine this
-  was built on, so no exported layout image is included.
+- **A CNN/U-Net unary.** The CRF (the thesis machinery) is built and evaluated
+  above; swapping its Random Forest unary for a learned convolutional one is
+  the remaining stretch goal. The prediction that spatial context would
+  "improve the map's appearance more than its CORINE-measured score" has now
+  been tested and held for the CRF (+0.005 accuracy, −47% speckle); a CNN
+  unary would face the same measurement.
+- **QGIS print layout.** Styles are generated (`qgis/*.qml`), a styled project
+  exists (`qgis/landcover.qgz`) and the layout steps are documented in
+  `qgis/README.md`; the exported map image itself is still to come.
 
 ## Data sources and licensing
 
@@ -308,11 +373,11 @@ is reproducible from the commands above.
 ```
 src/ingest/         STAC search, windowed COG reads, masking, indices
 src/labels/         CORINE fetch, reprojection, rasterisation
-src/models/         Random Forest baseline
+src/models/         Random Forest baseline + out-of-fold probabilities
 src/evaluation/     spatial splitting, metrics, figures
-src/postprocessing/ PostGIS loading, QGIS style generation
+src/postprocessing/ mean-field CRF, PostGIS loading, QGIS styles, web export
 sql/                schema + spatial analysis queries
-tests/              68 tests (pure logic + integration against a real stack)
+tests/              86 tests (pure logic + integration against a real stack)
 docker/             PostGIS container
 qgis/               generated .qml styles + layout instructions
 web/                static interactive demo (swipe map + choropleth)

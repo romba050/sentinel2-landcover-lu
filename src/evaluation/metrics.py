@@ -152,6 +152,50 @@ def accuracy_by_boundary_distance(
     return rows
 
 
+def fragmentation(
+    labels: np.ndarray,
+    nodata: int = 0,
+    tiny_px: int = 5,
+    pixel_m: float = 10.0,
+) -> dict:
+    """Landscape-fragmentation indicators for a class map.
+
+    Salt-and-pepper noise is quantifiable, and this is the vocabulary in which
+    land-monitoring reporting quantifies it: how many contiguous patches the
+    map decomposes into, how big they are, how much class-boundary edge exists
+    per unit area, and what share of pixels sit in patches too small to be
+    real land-cover objects (< ``tiny_px`` pixels).
+    """
+    from scipy import ndimage
+
+    struct = np.ones((3, 3), dtype=bool)  # 8-connectivity, matching the CRF grid
+    labelled = labels != nodata
+    total_px = int(labelled.sum())
+
+    n_patches = 0
+    tiny_pixels = 0
+    for cls in np.unique(labels[labelled]):
+        lab, n = ndimage.label(labels == cls, structure=struct)
+        sizes = np.bincount(lab.ravel())[1:]
+        n_patches += int(n)
+        tiny_pixels += int(sizes[sizes < tiny_px].sum())
+
+    # Class-boundary edge length: every 4-neighbour pair of labelled pixels
+    # with differing classes contributes one pixel-edge of ``pixel_m`` metres.
+    h_pairs = labelled[:, :-1] & labelled[:, 1:] & (labels[:, :-1] != labels[:, 1:])
+    v_pairs = labelled[:-1, :] & labelled[1:, :] & (labels[:-1, :] != labels[1:, :])
+    edge_km = (int(h_pairs.sum()) + int(v_pairs.sum())) * pixel_m / 1000.0
+    area_km2 = total_px * pixel_m * pixel_m / 1e6
+
+    return {
+        "n_patches": n_patches,
+        "mean_patch_ha": (total_px * pixel_m * pixel_m / 1e4) / max(n_patches, 1),
+        "edge_density_km_per_km2": edge_km / max(area_km2, 1e-9),
+        "tiny_patch_pixel_share": tiny_pixels / max(total_px, 1),
+        "tiny_threshold_px": tiny_px,
+    }
+
+
 def compare_splits(spatial: ClassificationReport, random_: ClassificationReport) -> dict:
     """Quantify how much a random pixel split inflates the score."""
     return {
