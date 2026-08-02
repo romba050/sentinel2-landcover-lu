@@ -141,6 +141,8 @@
       Classification + CRF smoothing (thesis method)</label>
     <label><input type="radio" name="cls" id="cls-rf">
       Classification, raw per-pixel</label>
+    <label><input type="radio" name="cls" id="cls-corine">
+      CORINE 2018 reference (hand-interpreted, ≥ 25 ha)</label>
     <label style="margin-top:6px"><input type="checkbox" id="tg-communes" checked>
       Commune boundaries</label>
   </section>
@@ -202,6 +204,12 @@ const imagery = L.imageOverlay(APP_DATA.layers.truecolor, bounds, { pane: "image
 const classLayers = {
   rf: L.imageOverlay(APP_DATA.layers.rf, bounds, { pane: "classes" }),
   crf: L.imageOverlay(APP_DATA.layers.crf, bounds, { pane: "classes" }),
+  corine: L.imageOverlay(APP_DATA.layers.corine, bounds, { pane: "classes" }),
+};
+const CLASS_LABELS = {
+  crf: "RF + mean-field CRF",
+  rf: "Random Forest, per-pixel",
+  corine: "CORINE 2018 reference (hand-interpreted)",
 };
 let activeClass = "crf";
 let classes = classLayers[activeClass].addTo(map);
@@ -212,8 +220,7 @@ function setClassLayer(which) {
   activeClass = which;
   classes = classLayers[activeClass];
   if (mode === "swipe") map.addLayer(classes);
-  document.getElementById("label-right").textContent =
-    which === "crf" ? "RF + mean-field CRF" : "Random Forest, per-pixel";
+  document.getElementById("label-right").textContent = CLASS_LABELS[which];
 }
 
 /* ----------------------------------------------------------------------- */
@@ -385,6 +392,7 @@ $("tg-communes").addEventListener("change", (e) => {
 });
 $("cls-crf").addEventListener("change", () => setClassLayer("crf"));
 $("cls-rf").addEventListener("change", () => setClassLayer("rf"));
+$("cls-corine").addEventListener("change", () => setClassLayer("corine"));
 
 renderClassLegend();
 updateSwipe();
@@ -396,6 +404,10 @@ if (location.hash === "#choro") setMode("choro");
 if (location.hash === "#raw") {
   setClassLayer("rf");
   document.getElementById("cls-rf").checked = true;
+}
+if (location.hash === "#corine") {
+  setClassLayer("corine");
+  document.getElementById("cls-corine").checked = true;
 }
 window.addEventListener("load", () => {
   map.invalidateSize();

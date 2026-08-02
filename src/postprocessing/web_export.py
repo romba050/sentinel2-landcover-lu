@@ -231,6 +231,13 @@ def build(out_dir: Path = WEB) -> dict:
 
     bounds4326 = export_classification(unary_path, kept, out_dir / "classification_rf.png")
     export_classification(crf_path, kept, out_dir / "classification_crf.png")
+    # The reference itself, same palette and grid: seeing CORINE's >= 25 ha
+    # polygons next to the 10 m ML maps is the clearest way to grasp both what
+    # the model learned from and what the reference cannot represent.
+    export_classification(
+        PROCESSED / labels_meta["files"]["labels"], kept,
+        out_dir / "classification_corine.png",
+    )
     export_truecolor(stack_path, out_dir / "truecolor.webp")
     # Commune statistics from the CRF map: it is the end product a per-commune
     # report would be built from (and loses half as much area to speckle).
@@ -294,6 +301,7 @@ def build(out_dir: Path = WEB) -> dict:
             "truecolor": "truecolor.webp",
             "rf": "classification_rf.png",
             "crf": "classification_crf.png",
+            "corine": "classification_corine.png",
         },
         "communes": json.loads(communes.to_json(to_wgs84=False)),
     }

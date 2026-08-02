@@ -21,7 +21,8 @@ python3 -m http.server -d web 8000   # then http://localhost:8000
 ```
 
 Deep links: `index.html#choro` opens directly in choropleth mode;
-`index.html#raw` opens the swipe with the raw (un-smoothed) classification.
+`index.html#raw` opens the swipe with the raw (un-smoothed) classification;
+`index.html#corine` opens it with the CORINE 2018 reference layer.
 
 ## Put it on your website
 
@@ -65,6 +66,7 @@ model results. `vendor/` is Leaflet 1.9.4, vendored deliberately.
 | `truecolor.webp` | generated — stretched scene, warped to EPSG:3857 |
 | `classification_rf.png` | generated — out-of-fold RF map, class colours, warped |
 | `classification_crf.png` | generated — the same probabilities after mean-field CRF |
+| `classification_corine.png` | generated — the CORINE 2018 reference labels, same palette |
 | `vendor/leaflet.{js,css}` | Leaflet 1.9.4, vendored |
 
 The displayed pair is deliberately out-of-fold unary vs the CRF on top of it:

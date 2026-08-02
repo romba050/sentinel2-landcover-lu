@@ -273,8 +273,11 @@ Selected output (`data/results/postgis_analysis.txt`):
 ### 5. Interactive demo — `web/`, `src/postprocessing/web_export.py`
 
 A fully static web map (`web/index.html`): swipe between the Sentinel-2 scene
-and the classification, or switch to a per-commune forest choropleth with
-partially-imaged communes explicitly excluded from the rating. No server, no
+and the classification — toggling between the raw per-pixel RF, the
+CRF-smoothed map, and the CORINE 2018 reference itself, all in one palette, so
+the 25 ha reference and the 10 m predictions can be compared eye-to-eye — or
+switch to a per-commune forest choropleth with partially-imaged communes
+explicitly excluded from the rating. No server, no
 tile provider, no external requests — the whole demo is ~2.3 MB of files that
 work from any static host. See `web/README.md` for embedding instructions.
 

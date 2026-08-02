@@ -1,6 +1,6 @@
 """Mean-field inference for a grid CRF over class probabilities.
 
-This is the thesis method (mean-field networks for pixel-wise segmentation)
+This is my MSc. thesis method (mean-field networks for pixel-wise segmentation)
 transplanted from retinal imagery to satellite imagery, with the neural unary
 swapped for the Random Forest's out-of-fold ``predict_proba``.
 
