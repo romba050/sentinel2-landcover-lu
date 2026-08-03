@@ -285,6 +285,8 @@ def build(out_dir: Path = WEB) -> dict:
                 "theta": theta,
                 "unary_accuracy": round(unary_res["overall_accuracy"], 3),
                 "crf_accuracy": round(crf_res["overall_accuracy"], 3),
+                "unary_kappa": round(unary_res["kappa"], 3),
+                "crf_kappa": round(crf_res["kappa"], 3),
                 "speckle_before_km2": round(
                     unary_res["vectorisation"]["dropped_speck_area_km2"], 1
                 ),

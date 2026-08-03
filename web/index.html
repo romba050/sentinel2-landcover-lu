@@ -130,7 +130,7 @@
   </section>
 
   <section>
-    <h2>Honest numbers</h2>
+    <h2>Classification metrics</h2>
     <div class="stats" id="stats"></div>
     <p class="note" style="margin-top:10px" id="method-note"></p>
   </section>
@@ -356,9 +356,11 @@ $("method-note").innerHTML =
   `with ${m.boundary_within_100m_pct}% of pixels within 100&thinsp;m of an edge, much of ` +
   `the apparent error is the 1:100&thinsp;000 label, not the model. ` +
   `The CRF layer applies mean-field smoothing (θ=${m.crf.theta}) over the classifier's ` +
-  `probabilities: speckle patches drop ${(m.crf.patches_before / 1000).toFixed(0)}k → ` +
-  `${(m.crf.patches_after / 1000).toFixed(0)}k while accuracy holds ` +
-  `(${m.crf.unary_accuracy.toFixed(2)} → ${m.crf.crf_accuracy.toFixed(2)}). ` +
+  `probabilities: the map falls from ${(m.crf.patches_before / 1000).toFixed(0)}k to ` +
+  `${(m.crf.patches_after / 1000).toFixed(0)}k contiguous patches — mostly by absorbing ` +
+  `single-pixel specks — while accuracy and Cohen's κ hold ` +
+  `(${m.crf.unary_accuracy.toFixed(2)} → ${m.crf.crf_accuracy.toFixed(2)}, ` +
+  `κ ${m.crf.unary_kappa.toFixed(2)} → ${m.crf.crf_kappa.toFixed(2)}). ` +
   `Toggle the raw layer to see the difference.`;
 
 /* ----------------------------------------------------------------------- */
