@@ -51,9 +51,8 @@ Thumbs.db
 .env
 .env.local
 
-# Models
-models/*.pth
-models/*.pkl
+# Models (any serialised format -- the RF joblib alone is ~160 MB)
+models/*
 !models/.gitkeep
 
 # Private session/application notes -- never commit
