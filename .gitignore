@@ -55,3 +55,7 @@ Thumbs.db
 models/*.pth
 models/*.pkl
 !models/.gitkeep
+
+# Private session/application notes -- never commit
+.claude/
+QGIS_README.md
