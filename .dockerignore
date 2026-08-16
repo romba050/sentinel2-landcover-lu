@@ -1,0 +1,3 @@
+# Only web/ enters the image; keep the build context minimal.
+*
+!web
