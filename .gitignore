@@ -1,3 +1,5 @@
+host_landcover.sh
+
 # Python
 __pycache__/
 *.py[cod]
@@ -58,3 +60,4 @@ models/*
 # Private session/application notes -- never commit
 .claude/
 QGIS_README.md
+*.aux.xml

@@ -7,8 +7,8 @@ validation**, and the result loaded into PostGIS for per-commune analysis.
 
 ![Sentinel-2 quicklook](data/results/figures/luxembourg-city_31UGR_2024-08-24_quicklook.jpg)
 
-> **What this is.** A self-directed learning project, built in about a week in
-> late July / August 2026 to transfer my MSc work on pixel-wise semantic
+> **What this is.** A self-directed learning project, built over the weekend of
+> 1-3 August 2026 to transfer my MSc work on pixel-wise semantic
 > segmentation (mean-field networks + CRF, retinal vessel segmentation) onto
 > satellite imagery. It is not production work and does not represent prior
 > professional Earth-observation experience. It was built with Claude Code
