@@ -1,5 +1,7 @@
 # Sentinel-2 land-cover classification over Luxembourg
 
+[![CI](https://github.com/romba050/sentinel2-landcover-lu/actions/workflows/ci.yml/badge.svg)](https://github.com/romba050/sentinel2-landcover-lu/actions/workflows/ci.yml)
+
 An end-to-end land-cover pipeline for a 21 × 21 km window around Luxembourg
 City: Sentinel-2 L2A imagery from a STAC API, CORINE Land Cover labels from the
 European Environment Agency, a Random Forest evaluated with **spatially-blocked
