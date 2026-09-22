@@ -19,8 +19,22 @@ rasterio = pytest.importorskip("rasterio")
 PROCESSED = Path(__file__).resolve().parents[1] / "data" / "processed"
 MANIFEST = PROCESSED / "latest_ingest.json"
 
+
+
+def _stack_available() -> bool:
+    """True only when the manifest AND the raster it points to are on disk.
+
+    The manifest is committed to git but the .tif is gitignored, so a fresh
+    clone (e.g. CI) has the former without the latter.
+    """
+    if not MANIFEST.exists():
+        return False
+    stack = json.loads(MANIFEST.read_text())["files"]["stack"]
+    return (PROCESSED / stack).exists()
+
+
 pytestmark = pytest.mark.skipif(
-    not MANIFEST.exists(), reason="no ingested stack; run `python -m src.ingest.sentinel2`"
+    not _stack_available(), reason="no ingested stack; run `python -m src.ingest.sentinel2`"
 )
 
 
